@@ -1,1 +1,7 @@
-export class CreateStoreDto {}
+export class CreateStoreDto {
+
+
+
+
+    
+}
