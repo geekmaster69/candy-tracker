@@ -2,18 +2,16 @@ import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { Store } from "./store.entity";
 
 @Entity()
-export class Promotion {
+export class StoreImage {
 
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column()
-    title: string;
-
-    @Column()
-    description: string;
+    @Column('text')
+    url: string;
 
     @ManyToOne(() => Store,
-        (store) => store.promotions)
-    store: Store;
+        (store) => store.images, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
+    store: Store
+
 }

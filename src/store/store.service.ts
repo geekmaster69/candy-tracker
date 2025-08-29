@@ -1,26 +1,81 @@
-import { Injectable } from '@nestjs/common';
-import { CreateStoreDto } from './dto/create-store.dto';
-import { UpdateStoreDto } from './dto/update-store.dto';
+import { BadRequestException, Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
+
+import { InjectRepository } from '@nestjs/typeorm';
+import { Store, StoreImage } from './entities';
+import { Repository } from 'typeorm';
+import { CreateStoreDto, UpdateStoreDto } from './dto';
 
 @Injectable()
 export class StoreService {
-  create(createStoreDto: CreateStoreDto) {
-    return 'This action adds a new store';
+  private readonly logger = new Logger('StoreService');
+
+  constructor(
+    @InjectRepository(Store)
+    private readonly storeRepository: Repository<Store>,
+
+    @InjectRepository(StoreImage)
+    private readonly storeImageRepository: Repository<StoreImage>
+  ) { }
+
+
+
+  async createStore(createStore: CreateStoreDto) {
+
+    try {
+
+      const { images = [], ...storeDetails } = createStore;
+
+      const store = this.storeRepository.create(createStore);
+
+      return await this.storeRepository.save(store);
+
+    } catch (error) {
+      this.handleExceptions(error);
+    }
   }
 
-  findAll() {
-    return `This action returns all store`;
+  async updateStore(id: string, updateStoreDto: UpdateStoreDto) {
+
+    const store = this.storeRepository.findOneBy({ id });
+
+    if (!store) throw new BadRequestException(`Store with id ${id} not found`);
+
+    try {
+      const storeUpdated = await this.storeRepository.preload({
+        id,
+        ...updateStoreDto
+      });
+
+      return await this.storeRepository.save(storeUpdated);
+
+    } catch (error) {
+      this.handleExceptions(error);
+
+    }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} store`;
+  async getAllActiveStores() {
+    return this.storeRepository.find({ where: { isActive: true }, relations: { images: true }, select: {latitude: true, longitude: true, images: true, id: true} })
   }
 
-  update(id: number, updateStoreDto: UpdateStoreDto) {
-    return `This action updates a #${id} store`;
+
+  async getStoreById(id: string) {
+
+    const store = await this.storeRepository.findOne({ where: { id } })
+
+    if (!store) throw new BadRequestException(`Store with id ${id} not found`);
+
+    return store;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} store`;
+  private handleExceptions(error: any) {
+    if (error.code === '23505') {
+      throw new BadRequestException(error.detail);
+    }
+
+    this.logger.error(error);
+    throw new InternalServerErrorException('Unexpected error, check server logs')
+
   }
+
 }

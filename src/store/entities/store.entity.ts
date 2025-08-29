@@ -1,12 +1,13 @@
-import { Column, CreateDateColumn, Entity, OneToMany, PrimaryColumn, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
-import { Promotion } from "./promotions.entity";
+import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Promotion, StoreImage } from "./";
+
 
 
 @Entity()
 export class Store {
 
-    @PrimaryGeneratedColumn()
-    id: number;
+    @PrimaryGeneratedColumn('uuid')
+    id: string;
 
     @Column({
         type: 'bool',
@@ -16,7 +17,8 @@ export class Store {
     isActive: boolean;
 
     @Column({
-        type: 'text'
+        type: 'text',
+        unique: true
     })
     title: string;
 
@@ -40,23 +42,32 @@ export class Store {
 
 
     @Column({
-        type: 'simple-array',
+        type: 'text',
+        array: true,
         default: []
 
     })
     socialMedia: string[];
 
 
-    @Column('decimal', { precision: 10, scale: 6 })
+    @Column('float')
     latitude: number;
 
-    @Column('decimal', { precision: 10, scale: 6 })
+    @Column('float')
     longitude: number;
+
 
 
     @OneToMany(() => Promotion,
         (promotion) => promotion.store)
     promotions: Promotion[];
+
+
+    @OneToMany(() => StoreImage,
+        (storeImage) => storeImage.store,
+        {cascade: true, eager: true}
+    )
+    images: StoreImage[]
 
 
     @CreateDateColumn({ type: 'timestamp' })
