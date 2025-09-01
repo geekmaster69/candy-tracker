@@ -56,4 +56,9 @@ export class CreateStoreDto {
     @ValidateNested({ each: true })
     @Type(() => CreateStoreImageDto)
     images: CreateStoreImageDto[];
+
+
+    @IsOptional()
+    @Type(() => CreateStoreImageDto)
+    profileImage?: CreateStoreImageDto;
 }

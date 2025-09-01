@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, OneToOne, Point, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { StoreImage } from "./store-image.entity";
 
 
 @Entity()
@@ -14,11 +15,30 @@ export class CandyLocation {
     })
     isActive: boolean;
 
-    @Column('float')
-    latitude: number;
 
-    @Column('float')
-    longitude: number;
+    @Column({
+        default: ''
+    })
+    title: string;
+
+    @Column({
+        type: 'geometry',
+        spatialFeatureType: 'Point',
+        srid: 4326, // Sistema de referencia geográfica (WGS84)
+    })
+    coordinates: Point;
+
+
+    @OneToOne(() => StoreImage,
+        (storeImage) => storeImage.candyLocation, { cascade: true, eager: true })
+    profileImage: StoreImage;
+
+    @CreateDateColumn({ type: 'timestamp' })
+    createdAt: Date;
+
+    @UpdateDateColumn({ type: 'timestamp' })
+    updatedAt: Date;
+
 
 
 }

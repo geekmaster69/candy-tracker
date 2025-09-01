@@ -1,9 +1,9 @@
 import { BadRequestException, Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
 
 import { InjectRepository } from '@nestjs/typeorm';
-import { Store, StoreImage } from './entities';
+import { CandyLocation, Store } from './entities';
 import { Repository } from 'typeorm';
-import { CreateStoreDto, UpdateStoreDto } from './dto';
+import { CreateCandyLocationDto, CreateStoreDto, StoreAreaDto, UpdateStoreDto } from './dto';
 
 @Injectable()
 export class StoreService {
@@ -13,8 +13,9 @@ export class StoreService {
     @InjectRepository(Store)
     private readonly storeRepository: Repository<Store>,
 
-    @InjectRepository(StoreImage)
-    private readonly storeImageRepository: Repository<StoreImage>
+    @InjectRepository(CandyLocation)
+    private readonly candyLocationRepository: Repository<CandyLocation>,
+
   ) { }
 
 
@@ -23,14 +24,43 @@ export class StoreService {
 
     try {
 
-      const { images = [], ...storeDetails } = createStore;
+      const { latitude, longitude, ...storeDetails } = createStore;
 
-      const store = this.storeRepository.create(createStore);
+      const store = this.storeRepository.create({
+        ...storeDetails,
+        coordinates: {
+          type: 'Point',
+          coordinates: [longitude, latitude]
+        }
+      });
 
       return await this.storeRepository.save(store);
 
     } catch (error) {
       this.handleExceptions(error);
+    }
+  }
+
+
+  async createCandyLocation(createCandyLocationDto: CreateCandyLocationDto) {
+
+    try {
+      const { latitude, longitude, ...candyLocationDetails } = createCandyLocationDto;
+
+      const candyLocation = this.candyLocationRepository.create({
+        ...candyLocationDetails,
+        coordinates: {
+          type: 'Point',
+          coordinates: [longitude, latitude]
+        }
+
+      });
+
+      return await this.candyLocationRepository.save(candyLocation);
+
+    } catch (error) {
+      this.handleExceptions(error);
+
     }
   }
 
@@ -43,7 +73,8 @@ export class StoreService {
     try {
       const storeUpdated = await this.storeRepository.preload({
         id,
-        ...updateStoreDto
+        ...updateStoreDto,
+
       });
 
       return await this.storeRepository.save(storeUpdated);
@@ -54,8 +85,96 @@ export class StoreService {
     }
   }
 
-  async getAllActiveStores() {
-    return this.storeRepository.find({ where: { isActive: true }, relations: { images: true }, select: {latitude: true, longitude: true, images: true, id: true} })
+  async getAllActiveStores(storeArea: StoreAreaDto) {
+
+    const stores = await this.getAllStore(storeArea);
+
+    const candyLocations = await this.getAllCandyLocation(storeArea);
+
+    return [
+      ...stores,
+      ...candyLocations
+    ]
+  }
+
+
+  private async getNearbyEntities<T>(
+    repository: Repository<T>,
+    alias: string,
+    storeArea: StoreAreaDto,
+    options: {
+      select: string[];
+      joins?: { property: string; alias: string }[];
+    }
+  ): Promise<T[]> {
+    const { lat, lng, distance = 2000 } = storeArea;
+
+    const query = repository.createQueryBuilder(alias);
+
+    // Aplicar joins opcionales
+    if (options.joins) {
+      for (const join of options.joins) {
+        query.leftJoinAndSelect(`${alias}.${join.property}`, join.alias);
+      }
+    }
+
+    return query
+      .select(options.select)
+      .where(`
+      ${alias}.isActive = true AND
+      ST_DWithin(
+        ${alias}.coordinates::geography,
+        ST_SetSRID(ST_MakePoint(:lng, :lat), 4326)::geography,
+        :distance
+      )
+    `)
+      .orderBy(`
+      ST_Distance(
+        ${alias}.coordinates::geography,
+        ST_SetSRID(ST_MakePoint(:lng, :lat), 4326)::geography
+      )
+    `)
+      .setParameters({ lat, lng, distance })
+      .getMany();
+  }
+
+  private async getAllStore(storeArea: StoreAreaDto) {
+
+    return this.getNearbyEntities(
+      this.storeRepository,
+      'store',
+      storeArea,
+      {
+        select: [
+          'store.id',
+          'store.title',
+          'store.coordinates',
+          'profileImage.url',
+        ],
+        joins: [
+          { property: 'profileImage', alias: 'profileImage' },
+        ],
+      }
+    );
+  }
+  private async getAllCandyLocation(storeArea: StoreAreaDto) {
+
+    return this.getNearbyEntities(
+      this.candyLocationRepository,
+      'cl',
+      storeArea,
+      {
+        select: [
+          'cl.id',
+          'cl.title',
+          'cl.coordinates',
+          'profileImage.url',
+        ],
+        joins: [
+          { property: 'profileImage', alias: 'profileImage' },
+        ],
+      }
+    );
   }
 
 

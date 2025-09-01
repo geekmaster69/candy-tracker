@@ -1,7 +1,5 @@
-import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, JoinColumn, OneToMany, OneToOne, Point, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { Promotion, StoreImage } from "./";
-
-
 
 @Entity()
 export class Store {
@@ -49,14 +47,12 @@ export class Store {
     })
     socialMedia: string[];
 
-
-    @Column('float')
-    latitude: number;
-
-    @Column('float')
-    longitude: number;
-
-
+    @Column({
+        type: 'geometry',
+        spatialFeatureType: 'Point',
+        srid: 4326, // Sistema de referencia geográfica (WGS84)
+    })
+    coordinates: Point;
 
     @OneToMany(() => Promotion,
         (promotion) => promotion.store)
@@ -65,9 +61,13 @@ export class Store {
 
     @OneToMany(() => StoreImage,
         (storeImage) => storeImage.store,
-        {cascade: true, eager: true}
+        { cascade: true, eager: true }
     )
     images: StoreImage[]
+
+    @OneToOne(() => StoreImage,
+        (storeImage) => storeImage.profileStoreImage, { cascade: true, eager: true })
+    profileImage: StoreImage;
 
 
     @CreateDateColumn({ type: 'timestamp' })

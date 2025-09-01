@@ -1,19 +1,23 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseUUIDPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseUUIDPipe, Query } from '@nestjs/common';
 import { StoreService } from './store.service';
-import { CreateStoreDto, UpdateStoreDto } from './dto';
+import { CreateCandyLocationDto, CreateStoreDto, StoreAreaDto, UpdateStoreDto } from './dto';
 
-@Controller('store')
+@Controller('locations')
 export class StoreController {
   constructor(private readonly storeService: StoreService) { }
 
-  @Post()
+  @Post('store')
   createStore(@Body() createStoreDto: CreateStoreDto) {
     return this.storeService.createStore(createStoreDto);
   }
+  @Post('candy')
+  createCandyLocation(@Body() createCandyLocation: CreateCandyLocationDto) {
+    return this.storeService.createCandyLocation(createCandyLocation);
+  }
 
   @Get()
-  getAllActiveStores() {
-    return this.storeService.getAllActiveStores()
+  getAllActiveStores(@Query() storeArea: StoreAreaDto) {
+    return this.storeService.getAllActiveStores(storeArea)
   }
 
   @Get(':id')
