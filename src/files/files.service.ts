@@ -2,7 +2,8 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { randomUUID } from 'crypto';
 import { v2 as cloudinary } from 'cloudinary'
 import { UploadApiResponse } from 'cloudinary';
-import { envs } from 'src/config/environments/envs';
+import { envs } from '../config/environments/envs';
+
 
 const folder = 'candyTracker';
 @Injectable()

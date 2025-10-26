@@ -7,7 +7,8 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 
 import { Injectable, UnauthorizedException } from "@nestjs/common";
-import { envs } from "src/config/environments/envs";
+import { envs } from "../../config/environments/envs";
+
 
 
 @Injectable()

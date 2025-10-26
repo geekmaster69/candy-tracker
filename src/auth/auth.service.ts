@@ -3,10 +3,11 @@ import { BadRequestException, Injectable, InternalServerErrorException, Unauthor
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
-import { Argon2Plugin } from 'src/config/plugins/atgon_2.plugin';
+
 import { CreateUserDto, LoginUserDto } from './dto';
 import { JwtPayload } from './interface';
 import { JwtService } from '@nestjs/jwt';
+import { Argon2Plugin } from '../config/plugins/atgon_2.plugin';
 
 @Injectable()
 export class AuthService {
