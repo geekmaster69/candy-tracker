@@ -13,12 +13,12 @@ export class CreateCandyLocationDto {
     @IsNotEmpty()
     title: string;
 
-    @IsNumber({ maxDecimalPlaces: 8 })
+    @IsNumber({ maxDecimalPlaces: 20 })
     @Min(-90)
     @Max(90)
     latitude: number;
 
-    @IsNumber({ maxDecimalPlaces: 8 })
+    @IsNumber({ maxDecimalPlaces: 20 })
     @Min(-180)
     @Max(180)
     longitude: number;
