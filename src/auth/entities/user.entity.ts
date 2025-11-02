@@ -1,4 +1,5 @@
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { CandyLocation } from "../../store/entities";
 
 @Entity()
 export class User {
@@ -21,6 +22,20 @@ export class User {
         default: ''
     })
     fullName: string;
+
+    @Column('text', {
+        array: true,
+        default: ['user']
+    })
+    roles: string[];
+
+    @OneToMany(
+        () => CandyLocation,
+        (candyLocation) => candyLocation.user
+    )
+    product: CandyLocation;
+
+
 
 
     @CreateDateColumn({ type: 'timestamp' })

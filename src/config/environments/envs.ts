@@ -5,6 +5,7 @@ import * as joi from 'joi';
 const envsSchema = joi.object({
 
   DB_URL: joi.string().required(),
+  PORT: joi.number().required(),
   JWT_SECRET: joi.string().required(),
   CLOUD_NAME: joi.string().required(),
   CLOUD_API_KEY: joi.string().required(),
@@ -19,6 +20,7 @@ if (error) {
 
 export const envs = {
   dbUrl: envVars.DB_URL,
+  port: envVars.PORT,
   cloudName: envVars.CLOUD_NAME,
   cloudApiKey: envVars.CLOUD_API_KEY,
   cloudApiSecret: envVars.CLOUD_API_SECRET,

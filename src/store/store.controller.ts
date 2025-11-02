@@ -1,12 +1,15 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, ParseUUIDPipe, Query } from '@nestjs/common';
 import { StoreService } from './store.service';
 import { CreateCandyLocationDto, CreateStoreDto, StoreAreaDto, UpdateStoreDto } from './dto';
+import { Auth } from '../auth/decorator/auth.decorator';
 
 @Controller('locations')
 export class StoreController {
   constructor(private readonly storeService: StoreService) { }
 
   @Post('store')
+  @Auth()
+  
   createStore(@Body() createStoreDto: CreateStoreDto) {
     return this.storeService.createStore(createStoreDto);
   }
