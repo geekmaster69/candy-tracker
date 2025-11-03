@@ -4,6 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { CandyLocation, Store } from './entities';
 import { Repository } from 'typeorm';
 import { CreateCandyLocationDto, CreateStoreDto, StoreAreaDto, UpdateStoreDto } from './dto';
+import { User } from '../auth/entities/user.entity';
 
 @Injectable()
 export class StoreService {
@@ -42,13 +43,14 @@ export class StoreService {
   }
 
 
-  async createCandyLocation(createCandyLocationDto: CreateCandyLocationDto) {
+  async createCandyLocation(createCandyLocationDto: CreateCandyLocationDto, user: User) {
 
     try {
       const { latitude, longitude, ...candyLocationDetails } = createCandyLocationDto;
 
       const candyLocation = this.candyLocationRepository.create({
         ...candyLocationDetails,
+        user,
         coordinates: {
           type: 'Point',
           coordinates: [longitude, latitude]

@@ -35,9 +35,6 @@ export class User {
     )
     product: CandyLocation;
 
-
-
-
     @CreateDateColumn({ type: 'timestamp' })
     createdAt: Date;
 
