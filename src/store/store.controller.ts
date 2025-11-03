@@ -31,6 +31,13 @@ export class StoreController {
     return this.storeService.getAllActiveStores(storeArea)
   }
 
+
+  @Get('user')
+  @Auth()
+  getCandyLocationsByUser(@GetUser() user: User) {
+    return this.storeService.getCandyLocationByUser(user)
+  }
+
   @Get(':id')
   findOne(@Param('id', ParseUUIDPipe) id: string) {
     return this.storeService.getStoreById(id)

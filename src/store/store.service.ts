@@ -44,7 +44,6 @@ export class StoreService {
 
 
   async createCandyLocation(createCandyLocationDto: CreateCandyLocationDto, user: User) {
-
     try {
       const { latitude, longitude, ...candyLocationDetails } = createCandyLocationDto;
 
@@ -56,13 +55,16 @@ export class StoreService {
           coordinates: [longitude, latitude]
         }
       });
-
       return await this.candyLocationRepository.save(candyLocation);
-
     } catch (error) {
       this.handleExceptions(error);
-
     }
+  }
+
+  async getCandyLocationByUser(user: User) {
+    return await this.candyLocationRepository.find({
+      where: { user: { id: user.id } },
+    });
   }
 
   async updateStore(id: string, updateStoreDto: UpdateStoreDto) {

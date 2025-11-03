@@ -33,7 +33,7 @@ export class User {
         () => CandyLocation,
         (candyLocation) => candyLocation.user
     )
-    product: CandyLocation;
+    candyLocations: CandyLocation;
 
     @CreateDateColumn({ type: 'timestamp' })
     createdAt: Date;

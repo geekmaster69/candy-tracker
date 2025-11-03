@@ -34,8 +34,7 @@ export class CandyLocation {
 
     @ManyToOne(
         () => User,
-        (user) => user.product,
-        { eager: true }
+        (user) => user.candyLocations,
     )
     user: User
 

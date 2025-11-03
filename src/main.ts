@@ -14,12 +14,10 @@ async function bootstrap() {
       forbidNonWhitelisted: true,
     })
   );
-  
+
   await app.listen(envs.port);
 
   console.log(`RUINING ON PORT: ${envs.port}`);
-  
 
-  
 }
 bootstrap();
