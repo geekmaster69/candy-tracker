@@ -55,7 +55,6 @@ export class StoreService {
           type: 'Point',
           coordinates: [longitude, latitude]
         }
-
       });
 
       return await this.candyLocationRepository.save(candyLocation);

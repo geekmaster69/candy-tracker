@@ -13,20 +13,18 @@ export class StoreController {
   @Auth()
   createStore(
     @Body() createStoreDto: CreateStoreDto,
-
   ) {
     return this.storeService.createStore(createStoreDto);
   }
+
   @Post('candy')
+  @Auth()
   createCandyLocation(
     @Body() createCandyLocation: CreateCandyLocationDto,
     @GetUser() user: User
   ) {
     return this.storeService.createCandyLocation(createCandyLocation, user);
   }
-
-
-  
 
   @Get()
   getAllActiveStores(@Query() storeArea: StoreAreaDto) {
