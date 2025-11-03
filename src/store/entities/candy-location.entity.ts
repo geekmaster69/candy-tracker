@@ -6,16 +6,15 @@ import { User } from "../../auth/entities/user.entity";
 @Entity()
 export class CandyLocation {
 
-    @PrimaryGeneratedColumn('uuid')
-    id: string;
+    @PrimaryGeneratedColumn()
+    id: number;
 
     @Column({
         type: 'bool',
         default: true,
-        primary: true
+        primary: true,
     })
     isActive: boolean;
-
 
     @Column({
         default: ''
@@ -28,7 +27,6 @@ export class CandyLocation {
         srid: 4326, // Sistema de referencia geográfica (WGS84)
     })
     coordinates: Point;
-
 
     @OneToOne(() => StoreImage,
         (storeImage) => storeImage.candyLocation, { cascade: true, eager: true })
