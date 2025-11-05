@@ -24,7 +24,7 @@ export class CandyLocation {
     @Column({
         type: 'geometry',
         spatialFeatureType: 'Point',
-        srid: 4326, // Sistema de referencia geográfica (WGS84)
+        srid: 4326, 
     })
     coordinates: Point;
 

@@ -11,8 +11,8 @@ export class StoreService {
   private readonly logger = new Logger('StoreService');
 
   constructor(
-    @InjectRepository(Store)
-    private readonly storeRepository: Repository<Store>,
+    // @InjectRepository(Store)
+    // private readonly storeRepository: Repository<Store>,
 
     @InjectRepository(CandyLocation)
     private readonly candyLocationRepository: Repository<CandyLocation>,
@@ -21,26 +21,26 @@ export class StoreService {
 
 
 
-  async createStore(createStore: CreateStoreDto) {
+  // async createStore(createStore: CreateStoreDto) {
 
-    try {
+  //   try {
 
-      const { latitude, longitude, ...storeDetails } = createStore;
+  //     const { latitude, longitude, ...storeDetails } = createStore;
 
-      const store = this.storeRepository.create({
-        ...storeDetails,
-        coordinates: {
-          type: 'Point',
-          coordinates: [longitude, latitude]
-        }
-      });
+  //     const store = this.storeRepository.create({
+  //       ...storeDetails,
+  //       coordinates: {
+  //         type: 'Point',
+  //         coordinates: [longitude, latitude]
+  //       }
+  //     });
 
-      return await this.storeRepository.save(store);
+  //     return await this.storeRepository.save(store);
 
-    } catch (error) {
-      this.handleExceptions(error);
-    }
-  }
+  //   } catch (error) {
+  //     this.handleExceptions(error);
+  //   }
+  // }
 
 
   async createCandyLocation(createCandyLocationDto: CreateCandyLocationDto, user: User) {
@@ -61,43 +61,45 @@ export class StoreService {
     }
   }
 
+  async getCandyLocationById(id: number) {
+
+    const candyLocation = await this.candyLocationRepository.findOne({ where: { id } })
+
+    if (!candyLocation) throw new BadRequestException(`Store with id ${id} not found`);
+
+    return candyLocation;
+
+  }
+
   async getCandyLocationByUser(user: User) {
     return await this.candyLocationRepository.find({
       where: { user: { id: user.id } },
     });
   }
 
-  async updateStore(id: string, updateStoreDto: UpdateStoreDto) {
+  // async updateStore(id: string, updateStoreDto: UpdateStoreDto) {
 
-    const store = this.storeRepository.findOneBy({ id });
+  //   const store = this.storeRepository.findOneBy({ id });
 
-    if (!store) throw new BadRequestException(`Store with id ${id} not found`);
+  //   if (!store) throw new BadRequestException(`Store with id ${id} not found`);
 
-    try {
-      const storeUpdated = await this.storeRepository.preload({
-        id,
-        ...updateStoreDto,
+  //   try {
+  //     const storeUpdated = await this.storeRepository.preload({
+  //       id,
+  //       ...updateStoreDto,
 
-      });
+  //     });
 
-      return await this.storeRepository.save(storeUpdated);
+  //     return await this.storeRepository.save(storeUpdated);
 
-    } catch (error) {
-      this.handleExceptions(error);
+  //   } catch (error) {
+  //     this.handleExceptions(error);
 
-    }
-  }
+  //   }
+  // }
 
   async getAllActiveStores(storeArea: StoreAreaDto) {
-
-    const stores = await this.getAllStore(storeArea);
-
-    const candyLocations = await this.getAllCandyLocation(storeArea);
-
-    return [
-      ...stores,
-      ...candyLocations
-    ]
+    return await this.getAllCandyLocation(storeArea);
   }
 
 
@@ -141,25 +143,25 @@ export class StoreService {
       .getMany();
   }
 
-  private async getAllStore(storeArea: StoreAreaDto) {
+  // private async getAllStore(storeArea: StoreAreaDto) {
 
-    return this.getNearbyEntities(
-      this.storeRepository,
-      'store',
-      storeArea,
-      {
-        select: [
-          'store.id',
-          'store.title',
-          'store.coordinates',
-          'profileImage.url',
-        ],
-        joins: [
-          { property: 'profileImage', alias: 'profileImage' },
-        ],
-      }
-    );
-  }
+  //   return this.getNearbyEntities(
+  //     this.storeRepository,
+  //     'store',
+  //     storeArea,
+  //     {
+  //       select: [
+  //         'store.id',
+  //         'store.title',
+  //         'store.coordinates',
+  //         'profileImage.url',
+  //       ],
+  //       joins: [
+  //         { property: 'profileImage', alias: 'profileImage' },
+  //       ],
+  //     }
+  //   );
+  // }
   private async getAllCandyLocation(storeArea: StoreAreaDto) {
 
     return this.getNearbyEntities(
@@ -181,14 +183,14 @@ export class StoreService {
   }
 
 
-  async getStoreById(id: string) {
+  // async getStoreById(id: string) {
 
-    const store = await this.storeRepository.findOne({ where: { id } })
+  //   const store = await this.storeRepository.findOne({ where: { id } })
 
-    if (!store) throw new BadRequestException(`Store with id ${id} not found`);
+  //   if (!store) throw new BadRequestException(`Store with id ${id} not found`);
 
-    return store;
-  }
+  //   return store;
+  // }
 
   private handleExceptions(error: any) {
     if (error.code === '23505') {
