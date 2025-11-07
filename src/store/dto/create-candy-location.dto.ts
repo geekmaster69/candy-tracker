@@ -1,5 +1,5 @@
 import { Type } from "class-transformer";
-import { IsBoolean, IsNotEmpty, IsNumber, IsOptional, IsString, Max, Min } from "class-validator";
+import { IsArray, IsBoolean, IsNotEmpty, IsNumber, IsOptional, IsString, Max, Min, ValidateNested } from "class-validator";
 import { CreateStoreImageDto } from "./create-store-image.dto";
 
 
@@ -26,7 +26,10 @@ export class CreateCandyLocationDto {
 
     @IsOptional()
     @Type(() => CreateStoreImageDto)
-    profileImage?: CreateStoreImageDto;
+    @ValidateNested({ each: true })
+    @IsArray()
+    storeImages: CreateStoreImageDto[];
+
 
 
 }

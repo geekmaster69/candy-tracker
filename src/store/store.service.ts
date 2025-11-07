@@ -1,9 +1,9 @@
-import { BadRequestException, Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException, Logger, NotFoundException } from '@nestjs/common';
 
 import { InjectRepository } from '@nestjs/typeorm';
-import { CandyLocation, Store } from './entities';
+import { CandyLocation,  StoreImage } from './entities';
 import { Repository } from 'typeorm';
-import { CreateCandyLocationDto, CreateStoreDto, StoreAreaDto, UpdateStoreDto } from './dto';
+import { CreateCandyLocationDto, StoreAreaDto, UpdateCandyLocationDto } from './dto';
 import { User } from '../auth/entities/user.entity';
 
 @Injectable()
@@ -11,36 +11,11 @@ export class StoreService {
   private readonly logger = new Logger('StoreService');
 
   constructor(
-    // @InjectRepository(Store)
-    // private readonly storeRepository: Repository<Store>,
 
     @InjectRepository(CandyLocation)
     private readonly candyLocationRepository: Repository<CandyLocation>,
 
   ) { }
-
-
-
-  // async createStore(createStore: CreateStoreDto) {
-
-  //   try {
-
-  //     const { latitude, longitude, ...storeDetails } = createStore;
-
-  //     const store = this.storeRepository.create({
-  //       ...storeDetails,
-  //       coordinates: {
-  //         type: 'Point',
-  //         coordinates: [longitude, latitude]
-  //       }
-  //     });
-
-  //     return await this.storeRepository.save(store);
-
-  //   } catch (error) {
-  //     this.handleExceptions(error);
-  //   }
-  // }
 
 
   async createCandyLocation(createCandyLocationDto: CreateCandyLocationDto, user: User) {
@@ -49,17 +24,32 @@ export class StoreService {
 
       const candyLocation = this.candyLocationRepository.create({
         ...candyLocationDetails,
+
         user,
         coordinates: {
           type: 'Point',
           coordinates: [longitude, latitude]
         }
       });
-      return await this.candyLocationRepository.save(candyLocation);
+      return await this.candyLocationRepository.save(candyLocation, {
+
+      });
     } catch (error) {
       this.handleExceptions(error);
     }
   }
+
+  async updateCandyLocation(id: number, updateCandyLocationDto: UpdateCandyLocationDto) {
+
+    const candyLocation = await this.candyLocationRepository.preload({ id:id, ...updateCandyLocationDto })
+
+    if (!candyLocation) throw new NotFoundException(`CandyLocation with id: ${id} not found`);
+
+    await this.candyLocationRepository.save(candyLocation)
+
+    return candyLocation;
+  }
+
 
   async getCandyLocationById(id: number) {
 
@@ -76,27 +66,6 @@ export class StoreService {
       where: { user: { id: user.id } },
     });
   }
-
-  // async updateStore(id: string, updateStoreDto: UpdateStoreDto) {
-
-  //   const store = this.storeRepository.findOneBy({ id });
-
-  //   if (!store) throw new BadRequestException(`Store with id ${id} not found`);
-
-  //   try {
-  //     const storeUpdated = await this.storeRepository.preload({
-  //       id,
-  //       ...updateStoreDto,
-
-  //     });
-
-  //     return await this.storeRepository.save(storeUpdated);
-
-  //   } catch (error) {
-  //     this.handleExceptions(error);
-
-  //   }
-  // }
 
   async getAllActiveStores(storeArea: StoreAreaDto) {
     return await this.getAllCandyLocation(storeArea);
@@ -143,25 +112,7 @@ export class StoreService {
       .getMany();
   }
 
-  // private async getAllStore(storeArea: StoreAreaDto) {
 
-  //   return this.getNearbyEntities(
-  //     this.storeRepository,
-  //     'store',
-  //     storeArea,
-  //     {
-  //       select: [
-  //         'store.id',
-  //         'store.title',
-  //         'store.coordinates',
-  //         'profileImage.url',
-  //       ],
-  //       joins: [
-  //         { property: 'profileImage', alias: 'profileImage' },
-  //       ],
-  //     }
-  //   );
-  // }
   private async getAllCandyLocation(storeArea: StoreAreaDto) {
 
     return this.getNearbyEntities(
@@ -182,15 +133,6 @@ export class StoreService {
     );
   }
 
-
-  // async getStoreById(id: string) {
-
-  //   const store = await this.storeRepository.findOne({ where: { id } })
-
-  //   if (!store) throw new BadRequestException(`Store with id ${id} not found`);
-
-  //   return store;
-  // }
 
   private handleExceptions(error: any) {
     if (error.code === '23505') {

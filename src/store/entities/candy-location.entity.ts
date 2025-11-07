@@ -1,7 +1,6 @@
-import { Column, CreateDateColumn, Entity, ManyToOne, OneToOne, Point, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, Index, ManyToOne, OneToMany, OneToOne, Point, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { StoreImage } from "./store-image.entity";
 import { User } from "../../auth/entities/user.entity";
-
 
 @Entity()
 export class CandyLocation {
@@ -9,10 +8,10 @@ export class CandyLocation {
     @PrimaryGeneratedColumn()
     id: number;
 
+    @Index()
     @Column({
         type: 'bool',
-        default: true,
-        primary: true,
+        default: true
     })
     isActive: boolean;
 
@@ -24,13 +23,13 @@ export class CandyLocation {
     @Column({
         type: 'geometry',
         spatialFeatureType: 'Point',
-        srid: 4326, 
+        srid: 4326,
     })
     coordinates: Point;
 
-    @OneToOne(() => StoreImage,
+    @OneToMany(() => StoreImage,
         (storeImage) => storeImage.candyLocation, { cascade: true, eager: true })
-    profileImage: StoreImage;
+    storeImages: StoreImage[];
 
     @ManyToOne(
         () => User,
@@ -43,7 +42,4 @@ export class CandyLocation {
 
     @UpdateDateColumn({ type: 'timestamp' })
     updatedAt: Date;
-
-
-
 }

@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, ParseUUIDPipe, Query, ParseIntPipe } from '@nestjs/common';
 import { StoreService } from './store.service';
-import { CreateCandyLocationDto, CreateStoreDto, StoreAreaDto, UpdateStoreDto } from './dto';
+import { CreateCandyLocationDto, StoreAreaDto, UpdateCandyLocationDto, } from './dto';
 
 import { User } from '../auth/entities/user.entity';
 import { Auth, GetUser } from '../auth/decorator';
@@ -9,15 +9,7 @@ import { Auth, GetUser } from '../auth/decorator';
 export class StoreController {
   constructor(private readonly storeService: StoreService) { }
 
-  // @Post('store')
-  // @Auth()
-  // createStore(
-  //   @Body() createStoreDto: CreateStoreDto,
-  // ) {
-  //   return this.storeService.createStore(createStoreDto);
-  // }
-
-  @Post('candy')
+  @Post()
   @Auth()
   createCandyLocation(
     @Body() createCandyLocation: CreateCandyLocationDto,
@@ -26,11 +18,21 @@ export class StoreController {
     return this.storeService.createCandyLocation(createCandyLocation, user);
   }
 
+
+  @Patch(':id')
+  @Auth()
+  updateCandyLocation(
+    @Body() updateCandyLocationDto: UpdateCandyLocationDto,
+
+    @Param('id', ParseIntPipe) id: number
+  ) {
+    return this.storeService.updateCandyLocation(id, updateCandyLocationDto);
+  }
+
   @Get()
   getAllActiveStores(@Query() storeArea: StoreAreaDto) {
     return this.storeService.getAllActiveStores(storeArea)
   }
-
 
   @Get('user')
   @Auth()
@@ -44,13 +46,8 @@ export class StoreController {
     return this.storeService.getCandyLocationById(id)
   }
 
-  // @Patch(':id')
-  // update(@Param('id', ParseUUIDPipe) id: string, @Body() updateStoreDto: UpdateStoreDto) {
-  //   return this.storeService.updateStore(id, updateStoreDto)
-  // }
-
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  remove(@Param('id') id: number) {
 
   }
 }
