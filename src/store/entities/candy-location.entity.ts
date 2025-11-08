@@ -1,4 +1,4 @@
-import { Column, CreateDateColumn, Entity, Index, ManyToOne, OneToMany, OneToOne, Point, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, Index, ManyToOne, OneToMany, Point, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { StoreImage } from "./store-image.entity";
 import { User } from "../../auth/entities/user.entity";
 
@@ -19,6 +19,18 @@ export class CandyLocation {
         default: ''
     })
     title: string;
+
+    @Column({
+        default: '',
+        type:'text'
+    })
+    description: string;
+
+    @Column({
+        type: 'integer',
+        default: 100
+    })
+    quantity: number;
 
     @Column({
         type: 'geometry',

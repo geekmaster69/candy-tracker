@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseUUIDPipe, Query, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, ParseIntPipe } from '@nestjs/common';
 import { StoreService } from './store.service';
 import { CreateCandyLocationDto, StoreAreaDto, UpdateCandyLocationDto, } from './dto';
 

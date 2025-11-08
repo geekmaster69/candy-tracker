@@ -13,6 +13,15 @@ export class CreateCandyLocationDto {
     @IsNotEmpty()
     title: string;
 
+    @IsString()
+    @IsOptional()
+    description: string;
+
+    @IsNumber()
+    @Min(1)
+    @IsOptional()
+    quantity: number;
+
     @IsNumber({ maxDecimalPlaces: 20 })
     @Min(-90)
     @Max(90)
@@ -22,7 +31,6 @@ export class CreateCandyLocationDto {
     @Min(-180)
     @Max(180)
     longitude: number;
-
 
     @IsOptional()
     @Type(() => CreateStoreImageDto)
