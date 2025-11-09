@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable, InternalServerErrorException, Logger, NotFoundException } from '@nestjs/common';
 
 import { InjectRepository } from '@nestjs/typeorm';
-import { CandyLocation,  StoreImage } from './entities';
+import { CandyLocation, StoreImage } from './entities';
 import { Repository } from 'typeorm';
 import { CreateCandyLocationDto, StoreAreaDto, UpdateCandyLocationDto } from './dto';
 import { User } from '../auth/entities/user.entity';
@@ -41,7 +41,7 @@ export class StoreService {
 
   async updateCandyLocation(id: number, updateCandyLocationDto: UpdateCandyLocationDto) {
 
-    const candyLocation = await this.candyLocationRepository.preload({ id:id, ...updateCandyLocationDto })
+    const candyLocation = await this.candyLocationRepository.preload({ id: id, ...updateCandyLocationDto })
 
     if (!candyLocation) throw new NotFoundException(`CandyLocation with id: ${id} not found`);
 
@@ -67,71 +67,69 @@ export class StoreService {
     });
   }
 
-  async getAllActiveStores(storeArea: StoreAreaDto) {
-    return await this.getAllCandyLocation(storeArea);
+  // async getAllActiveStores(storeArea: StoreAreaDto) {
+  //   return await this.getAllCandyLocation(storeArea);
+  // }
+
+
+private async getNearbyEntities<T>(
+  alias: string,
+  storeArea: StoreAreaDto,
+  options: {
+    select: string[];
+    joins?: { property: string; alias: string }[];
   }
+): Promise<CandyLocation[]> {
+  const { lat, lng, distance = 2000 } = storeArea;
 
+  const query = this.candyLocationRepository.createQueryBuilder(alias);
 
-  private async getNearbyEntities<T>(
-    repository: Repository<T>,
-    alias: string,
-    storeArea: StoreAreaDto,
-    options: {
-      select: string[];
-      joins?: { property: string; alias: string }[];
-    }
-  ): Promise<T[]> {
-    const { lat, lng, distance = 2000 } = storeArea;
+  // Aplicar joins opcionales
+  options.joins?.forEach(({ property, alias: joinAlias }) => {
+    query.leftJoinAndSelect(`${alias}.${property}`, joinAlias);
+  });
 
-    const query = repository.createQueryBuilder(alias);
-
-    // Aplicar joins opcionales
-    if (options.joins) {
-      for (const join of options.joins) {
-        query.leftJoinAndSelect(`${alias}.${join.property}`, join.alias);
-      }
-    }
-
-    return query
-      .select(options.select)
-      .where(`
-      ${alias}.isActive = true AND
-      ST_DWithin(
+  query
+    .select(options.select)
+    .where(`
+      ${alias}.isActive = true
+      AND ST_DWithin(
         ${alias}.coordinates::geography,
         ST_SetSRID(ST_MakePoint(:lng, :lat), 4326)::geography,
         :distance
       )
     `)
-      .orderBy(`
+    .orderBy(`
       ST_Distance(
         ${alias}.coordinates::geography,
         ST_SetSRID(ST_MakePoint(:lng, :lat), 4326)::geography
       )
     `)
-      .setParameters({ lat, lng, distance })
-      .getMany();
-  }
+    .setParameters({ lat, lng, distance });
+
+  return query.getMany();
+}
 
 
-  private async getAllCandyLocation(storeArea: StoreAreaDto) {
 
-    return this.getNearbyEntities(
-      this.candyLocationRepository,
-      'cl',
-      storeArea,
-      {
-        select: [
-          'cl.id',
-          'cl.title',
-          'cl.coordinates',
-          'profileImage.url',
-        ],
-        joins: [
-          { property: 'profileImage', alias: 'profileImage' },
-        ],
-      }
-    );
-  }
+async getAllActiveStores(storeArea: StoreAreaDto) {
+  return this.getNearbyEntities(
+    'cl',
+    storeArea,
+    {
+      select: [
+        'cl.id',
+        'cl.title',
+        'cl.coordinates',
+        'storeImages.id',
+        'storeImages.url',
+      ],
+      joins: [
+        { property: 'storeImages', alias: 'storeImages' },
+      ],
+    },
+  );
+}
 
 
   private handleExceptions(error: any) {
