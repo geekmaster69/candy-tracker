@@ -8,14 +8,14 @@ import { User } from '../auth/entities/user.entity';
 
 
 function mapCandyLocation(location: CandyLocation) {
-  const [longitud, latitud] = location.coordinates.coordinates;
+  const [longitude, latitude] = location.coordinates.coordinates;
 
   return {
     id: location.id,
     title: location.title,
     description: location.description,
-    latitud,
-    longitud,
+    latitude,
+    longitude,
     quantity: location.quantity,
     isActive: location.isActive,
     createdAt: location.createdAt,
@@ -50,7 +50,7 @@ export class StoreService {
           coordinates: [longitude, latitude]
         }
       });
-      const location =  await this.candyLocationRepository.save(candyLocation);
+      const location = await this.candyLocationRepository.save(candyLocation);
       return mapCandyLocation(location);
     } catch (error) {
       this.handleExceptions(error);
@@ -125,7 +125,7 @@ export class StoreService {
     `)
       .setParameters({ lat, lng, distance });
 
-    const locations = await  query.getMany();
+    const locations = await query.getMany();
 
     return locations.map(mapCandyLocation);
   }
