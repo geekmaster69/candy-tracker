@@ -140,6 +140,8 @@ export class StoreService {
         select: [
           'cl.id',
           'cl.title',
+          'cl.description',
+          'cl.quantity',
           'cl.coordinates',
           'storeImages.url',
         ],
