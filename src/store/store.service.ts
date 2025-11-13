@@ -80,14 +80,13 @@ export class StoreService {
   }
 
   async getCandyLocationByUser(user: User) {
-    return await this.candyLocationRepository.find({
+    const locations = await this.candyLocationRepository.find({
       where: { user: { id: user.id } },
     });
+
+    return locations.map(mapCandyLocation);
   }
 
-  // async getAllActiveStores(storeArea: StoreAreaDto) {
-  //   return await this.getAllCandyLocation(storeArea);
-  // }
 
 
   private async getNearbyEntities<T>(
