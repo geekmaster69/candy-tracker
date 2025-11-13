@@ -6,6 +6,25 @@ import { Repository } from 'typeorm';
 import { CreateCandyLocationDto, StoreAreaDto, UpdateCandyLocationDto } from './dto';
 import { User } from '../auth/entities/user.entity';
 
+
+function mapCandyLocation(location: CandyLocation) {
+  const [longitud, latitud] = location.coordinates.coordinates;
+
+  return {
+    id: location.id,
+    title: location.title,
+    description: location.description,
+    latitud,
+    longitud,
+    quantity: location.quantity,
+    isActive: location.isActive,
+    createdAt: location.createdAt,
+    updatedAt: location.updatedAt,
+    storeImages: location.storeImages,
+  };
+}
+
+
 @Injectable()
 export class StoreService {
   private readonly logger = new Logger('StoreService');
@@ -31,9 +50,8 @@ export class StoreService {
           coordinates: [longitude, latitude]
         }
       });
-      return await this.candyLocationRepository.save(candyLocation, {
-
-      });
+      const location =  await this.candyLocationRepository.save(candyLocation);
+      return mapCandyLocation(location);
     } catch (error) {
       this.handleExceptions(error);
     }
@@ -47,7 +65,7 @@ export class StoreService {
 
     await this.candyLocationRepository.save(candyLocation)
 
-    return candyLocation;
+    return mapCandyLocation(candyLocation);
   }
 
 
@@ -57,7 +75,7 @@ export class StoreService {
 
     if (!candyLocation) throw new BadRequestException(`Store with id ${id} not found`);
 
-    return candyLocation;
+    return mapCandyLocation(candyLocation);
 
   }
 
@@ -72,26 +90,26 @@ export class StoreService {
   // }
 
 
-private async getNearbyEntities<T>(
-  alias: string,
-  storeArea: StoreAreaDto,
-  options: {
-    select: string[];
-    joins?: { property: string; alias: string }[];
-  }
-): Promise<CandyLocation[]> {
-  const { lat, lng, distance = 2000 } = storeArea;
+  private async getNearbyEntities<T>(
+    alias: string,
+    storeArea: StoreAreaDto,
+    options: {
+      select: string[];
+      joins?: { property: string; alias: string }[];
+    }
+  ) {
+    const { lat, lng, distance = 2000 } = storeArea;
 
-  const query = this.candyLocationRepository.createQueryBuilder(alias);
+    const query = this.candyLocationRepository.createQueryBuilder(alias);
 
-  // Aplicar joins opcionales
-  options.joins?.forEach(({ property, alias: joinAlias }) => {
-    query.leftJoinAndSelect(`${alias}.${property}`, joinAlias);
-  });
+    // Aplicar joins opcionales
+    options.joins?.forEach(({ property, alias: joinAlias }) => {
+      query.leftJoinAndSelect(`${alias}.${property}`, joinAlias);
+    });
 
-  query
-    .select(options.select)
-    .where(`
+    query
+      .select(options.select)
+      .where(`
       ${alias}.isActive = true
       AND ST_DWithin(
         ${alias}.coordinates::geography,
@@ -99,37 +117,38 @@ private async getNearbyEntities<T>(
         :distance
       )
     `)
-    .orderBy(`
+      .orderBy(`
       ST_Distance(
         ${alias}.coordinates::geography,
         ST_SetSRID(ST_MakePoint(:lng, :lat), 4326)::geography
       )
     `)
-    .setParameters({ lat, lng, distance });
+      .setParameters({ lat, lng, distance });
 
-  return query.getMany();
-}
+    const locations = await  query.getMany();
+
+    return locations.map(mapCandyLocation);
+  }
 
 
 
-async getAllActiveStores(storeArea: StoreAreaDto) {
-  return this.getNearbyEntities(
-    'cl',
-    storeArea,
-    {
-      select: [
-        'cl.id',
-        'cl.title',
-        'cl.coordinates',
-        'storeImages.id',
-        'storeImages.url',
-      ],
-      joins: [
-        { property: 'storeImages', alias: 'storeImages' },
-      ],
-    },
-  );
-}
+  async getAllActiveStores(storeArea: StoreAreaDto) {
+    return this.getNearbyEntities(
+      'cl',
+      storeArea,
+      {
+        select: [
+          'cl.id',
+          'cl.title',
+          'cl.coordinates',
+          'storeImages.url',
+        ],
+        joins: [
+          { property: 'storeImages', alias: 'storeImages' },
+        ],
+      },
+    );
+  }
 
 
   private handleExceptions(error: any) {
