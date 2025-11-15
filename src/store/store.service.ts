@@ -142,10 +142,10 @@ export class StoreService {
           'cl.description',
           'cl.quantity',
           'cl.coordinates',
-          'storeImages.url',
+          'images.url',
         ],
         joins: [
-          { property: 'storeImages', alias: 'storeImages' },
+          { property: 'images', alias: 'images' },
         ],
       },
     );
