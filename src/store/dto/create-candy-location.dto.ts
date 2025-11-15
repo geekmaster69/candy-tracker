@@ -36,7 +36,7 @@ export class CreateCandyLocationDto {
     @Type(() => CreateStoreImageDto)
     @ValidateNested({ each: true })
     @IsArray()
-    storeImages: CreateStoreImageDto[];
+    images: CreateStoreImageDto[];
 
 
 

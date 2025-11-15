@@ -41,7 +41,7 @@ export class CandyLocation {
 
     @OneToMany(() => StoreImage,
         (storeImage) => storeImage.candyLocation, { cascade: true, eager: true })
-    storeImages: StoreImage[];
+    images: StoreImage[];
 
     @ManyToOne(
         () => User,

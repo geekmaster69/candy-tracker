@@ -11,7 +11,7 @@ export class StoreImage {
     @Column('text')
     url: string;
 
-    @ManyToOne(() => CandyLocation, candyLocation => candyLocation.storeImages, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
+    @ManyToOne(() => CandyLocation, candyLocation => candyLocation.images, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
 
     candyLocation: CandyLocation;
 

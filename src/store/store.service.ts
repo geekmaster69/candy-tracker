@@ -20,7 +20,7 @@ function mapCandyLocation(location: CandyLocation) {
     isActive: location.isActive,
     createdAt: location.createdAt,
     updatedAt: location.updatedAt,
-    storeImages: location.storeImages,
+    storeImages: location.images,
   };
 }
 

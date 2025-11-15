@@ -8,10 +8,7 @@ import { envs } from '../config/environments/envs';
 const folder = 'candyTracker';
 @Injectable()
 export class FilesService {
-
-
-
-
+  
   constructor() {
 
     cloudinary.config({
