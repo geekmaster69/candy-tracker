@@ -143,6 +143,7 @@ export class StoreService {
           'cl.description',
           'cl.quantity',
           'cl.coordinates',
+          'cl.promotions',
           'images.url',
         ],
         joins: [
