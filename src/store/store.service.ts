@@ -16,6 +16,7 @@ function mapCandyLocation(location: CandyLocation) {
     description: location.description,
     latitude,
     longitude,
+    promotions: location.promotions,
     quantity: location.quantity,
     isActive: location.isActive,
     createdAt: location.createdAt,
