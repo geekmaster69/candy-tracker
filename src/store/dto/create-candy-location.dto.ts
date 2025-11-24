@@ -17,6 +17,11 @@ export class CreateCandyLocationDto {
     @IsOptional()
     description: string;
 
+    @IsString({ each: true })
+    @IsArray()
+    @IsOptional()
+    promotions: string[]
+
     @IsNumber()
     @Min(1)
     @IsOptional()

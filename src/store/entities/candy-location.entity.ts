@@ -22,9 +22,16 @@ export class CandyLocation {
 
     @Column({
         default: '',
-        type:'text'
+        type: 'text'
     })
     description: string;
+
+
+    @Column('text', {
+        array: true,
+        default: []
+    })
+    promotions: string[];
 
     @Column({
         type: 'integer',
