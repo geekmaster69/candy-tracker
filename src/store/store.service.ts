@@ -59,8 +59,14 @@ export class StoreService {
   }
 
   async updateCandyLocation(id: number, updateCandyLocationDto: UpdateCandyLocationDto) {
+    const { latitude, longitude, ...candyLocationDetails } = updateCandyLocationDto;
 
-    const candyLocation = await this.candyLocationRepository.preload({ id: id, ...updateCandyLocationDto })
+    const candyLocation = await this.candyLocationRepository.preload({
+      id: id, ...updateCandyLocationDto, coordinates: {
+        type: 'Point',
+        coordinates: [longitude, latitude]
+      }
+    })
 
     if (!candyLocation) throw new NotFoundException(`CandyLocation with id: ${id} not found`);
 
