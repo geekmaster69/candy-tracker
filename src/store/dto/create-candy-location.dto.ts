@@ -23,7 +23,7 @@ export class CreateCandyLocationDto {
     promotions: string[]
 
     @IsNumber()
-    @Min(1)
+    @Min(0)
     @IsOptional()
     quantity: number;
 
