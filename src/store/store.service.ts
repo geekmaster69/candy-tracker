@@ -62,7 +62,7 @@ export class StoreService {
     const { latitude, longitude, ...candyLocationDetails } = updateCandyLocationDto;
 
     const candyLocation = await this.candyLocationRepository.preload({
-      id: id, ...updateCandyLocationDto, coordinates: {
+      id: id,...candyLocationDetails , coordinates: {
         type: 'Point',
         coordinates: [longitude, latitude]
       }
