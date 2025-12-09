@@ -8,6 +8,13 @@ async function bootstrap() {
 
   app.setGlobalPrefix('api');
 
+
+  app.enableCors({
+    origin: ['https://candy-tracker.netlify.app'],
+    credentials: true,
+  });
+
+
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
