@@ -1,6 +1,6 @@
 import { Controller, Post, Body, Get } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { CreateUserDto, LoginUserDto } from './dto';
+import { CreateUserDto, DeleteUserDto, LoginUserDto } from './dto';
 import { Auth, GetUser } from './decorator';
 import { User } from './entities/user.entity';
 
@@ -25,6 +25,12 @@ export class AuthController {
   @Auth()
   checkAuthStatus(@GetUser() user: User) {
     return this.authService.checkAuthStatus(user);
+  }
+
+  @Post('delete')
+  deleteAccount(@Body() deleteUserDto: DeleteUserDto) {
+    return this.deleteAccount(deleteUserDto);
+
   }
 
 }

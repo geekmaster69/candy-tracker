@@ -1,5 +1,6 @@
+import { DeleteUserDto } from './dto/delete_user.dto';
 
-import { BadRequestException, Injectable, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
@@ -76,6 +77,21 @@ export class AuthService {
 
   private getJwToken(payload: JwtPayload): string {
     return this.jwtService.sign(payload);
+  }
+
+  async deleteAccount(deleteUserDto: DeleteUserDto) {
+
+    const user = await this.userRepository.findOne({
+      where: {
+        email: deleteUserDto.email
+      }
+    })
+
+    if (!user) throw new NotFoundException('Error al borrar');
+
+
+    await this.userRepository.remove(user);
+    return 'Borrado con exito';
   }
 
   private handleDbErrors(error: any): never {
