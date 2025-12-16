@@ -48,6 +48,7 @@ export class StoreController {
 
   @Delete(':id')
   remove(@Param('id') id: number) {
+    return this.storeService.deleteCandyLocationById(id);
 
   }
 }

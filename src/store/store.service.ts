@@ -62,7 +62,7 @@ export class StoreService {
     const { latitude, longitude, ...candyLocationDetails } = updateCandyLocationDto;
 
     const candyLocation = await this.candyLocationRepository.preload({
-      id: id,...candyLocationDetails , coordinates: {
+      id: id, ...candyLocationDetails, coordinates: {
         type: 'Point',
         coordinates: [longitude, latitude]
       }
@@ -108,7 +108,7 @@ export class StoreService {
 
     const query = this.candyLocationRepository.createQueryBuilder(alias);
 
-    // Aplicar joins opcionales
+
     options.joins?.forEach(({ property, alias: joinAlias }) => {
       query.leftJoinAndSelect(`${alias}.${property}`, joinAlias);
     });
@@ -157,6 +157,18 @@ export class StoreService {
         ],
       },
     );
+  }
+
+  async deleteCandyLocationById(id: number) {
+
+    const candyLocation = await this.candyLocationRepository.findOneBy({ id });
+
+    if (!candyLocation) {
+      throw new NotFoundException('Candy location not found');
+    }
+
+    return this.candyLocationRepository.remove(candyLocation);
+
   }
 
 
