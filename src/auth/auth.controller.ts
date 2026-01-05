@@ -1,6 +1,6 @@
 import { Controller, Post, Body, Get } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { CreateUserDto, DeleteUserDto, LoginUserDto } from './dto';
+import { CreateUserDto, DeleteUserDto, LoginUserDto, RecoveryPasswordDto } from './dto';
 import { Auth, GetUser } from './decorator';
 import { User } from './entities/user.entity';
 
@@ -29,8 +29,12 @@ export class AuthController {
 
   @Post('delete')
   deleteAccount(@Body() deleteUserDto: DeleteUserDto) {
-    return this.deleteAccount(deleteUserDto);
+    return this.authService.deleteAccount(deleteUserDto);
+  }
 
+  @Post('recovery')
+  recoveryPassword(@Body() recoveryPasswordDto: RecoveryPasswordDto ) {
+    return this.authService.recoveryPassword(recoveryPasswordDto);
   }
 
 }

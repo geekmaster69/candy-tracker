@@ -7,6 +7,7 @@ import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { envs } from '../config/environments/envs';
 import { JwtStrategy } from './strategie/jwt.strategy';
+import { MailModule } from '../mail/mail.module';
 
 
 
@@ -30,7 +31,8 @@ import { JwtStrategy } from './strategie/jwt.strategy';
       signOptions: {
         expiresIn: '2h'
       }
-    })
+    }),
+    MailModule
 
   ],
   exports: [TypeOrmModule, JwtStrategy, PassportModule, JwtModule]

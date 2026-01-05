@@ -4,6 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { FilesModule } from './files/files.module';
 import { envs } from './config/environments/envs';
 import { AuthModule } from './auth/auth.module';
+import { MailModule } from './mail/mail.module';
 
 
 
@@ -17,7 +18,8 @@ import { AuthModule } from './auth/auth.module';
     }),
     StoreModule,
     FilesModule,
-    AuthModule],
+    AuthModule,
+    MailModule],
   controllers: [],
   providers: [],
 })
