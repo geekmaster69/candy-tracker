@@ -23,8 +23,6 @@ import { MailModule } from '../mail/mail.module';
       defaultStrategy: 'jwt'
     }),
 
-    
-
     JwtModule.register({
       secret: envs.jwtSecret,
   

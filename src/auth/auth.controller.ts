@@ -4,8 +4,6 @@ import { CreateUserDto, DeleteUserDto, LoginUserDto, RecoveryPasswordDto } from 
 import { Auth, GetUser } from './decorator';
 import { User } from './entities/user.entity';
 
-
-
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) { }
@@ -14,7 +12,6 @@ export class AuthController {
   createUser(@Body() createUserDto: CreateUserDto) {
     return this.authService.createUser(createUserDto);
   }
-
 
   @Post('login')
   loginUser(@Body() loginUser: LoginUserDto) {
