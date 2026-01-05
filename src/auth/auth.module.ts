@@ -35,6 +35,6 @@ import { MailModule } from '../mail/mail.module';
     MailModule
 
   ],
-  exports: [TypeOrmModule, JwtStrategy, PassportModule, JwtModule]
+  exports: [TypeOrmModule, JwtStrategy, PassportModule, JwtModule, MailModule]
 })
 export class AuthModule { }
